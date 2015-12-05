@@ -27,7 +27,6 @@ print "#features = ", dim_x, "#labels = ", dim_y
 
 print "compiling..."
 model = RNN(dim_x, dim_y, hidden_size, cell, optimizer, drop_rate)
-#model = load_model("./model/char_rnn.model", model)
 
 print "training..."
 start = time.time()
@@ -47,13 +46,14 @@ for i in xrange(2000):
     for s in xrange(int(sents.shape[1] / dim_y)):
         xs = sents[:, s * dim_y : (s + 1) * dim_y]
         for w in xrange(xs.shape[0]):
+            if i2w[np.argmax(xs[w,:])] == "<eoss>":
+                break
             print i2w[np.argmax(xs[w,:])],
         print "\n"
 
     error /= len(data_xy);
     if error < g_error:
         g_error = error
-        #save_model("./model/rnn.model_" + str(i), model)
 
     print "Iter = " + str(i) + ", Error = " + str(error) + ", Time = " + str(in_time)
     if error <= e:
@@ -63,8 +63,4 @@ print "Finished. Time = " + str(time.time() - start)
 
 print "save model..."
 save_model("./model/char_rnn.model", model)
-
-print "load model..."
-loaded_model = RNN(dim_x, dim_y, hidden_size, cell, optimizer, drop_rate)
-loaded_model = load_model("./model/char_rnn.model", loaded_model)
 

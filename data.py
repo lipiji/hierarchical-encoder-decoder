@@ -21,37 +21,6 @@ def load_stop_words(f_path = None):
 
     return stop_words
 
-def char_sequence(f_path = None, batch_size = 1):
-    seqs = []
-    i2w = {}
-    w2i = {}
-    lines = []
-    if f_path == None:
-        f = open(curr_path + "/data/toy.txt", "r")
-    else:
-        f = open(curr_path + "/" + f_path, "r")
-    for line in f:
-        line = line.strip('\n').lower()
-        if len(line) < 3:
-            continue
-        lines.append(line)
-        for char in line:
-            if char not in w2i:
-                i2w[len(w2i)] = char
-                w2i[char] = len(w2i)
-    f.close()
-
-    for i in range(0, len(lines)):
-        line = lines[i]
-        x = np.zeros((len(line), len(w2i)), dtype = theano.config.floatX)
-        for j in range(0, len(line)):
-            x[j, w2i[line[j]]] = 1
-        seqs.append(np.asmatrix(x))
-
-    data_xy = batch_sequences(seqs, i2w, w2i, batch_size)
-    print "#dic = " + str(len(w2i))
-    return seqs, i2w, w2i, data_xy
-
 def word_sequence(f_path, batch_size = 1):
     seqs = []
     i2w = {}
@@ -62,6 +31,7 @@ def word_sequence(f_path, batch_size = 1):
     for line in f:
         line = line.strip('\n').lower()
         words = line.split()
+        words.append("<eoss>") # end symbol
         if len(words) < 3 or line == "====":
             continue
         lines.append(words)
@@ -95,8 +65,8 @@ def batch_sequences(seqs, i2w, w2i, batch_size):
     zeros_m = np.zeros((1, dim), dtype = theano.config.floatX)
     for i in xrange(len(seqs)):
         seq = seqs[i];
-        X = seq[0 : len(seq) - 1, ]
-        Y = seq[1 : len(seq), ]
+        X = seq[0 : len(seq), ]
+        Y = seq[0 : len(seq), ]
         batch_x.append(X)
         seqs_len.append(X.shape[0])
         batch_y.append(Y)
