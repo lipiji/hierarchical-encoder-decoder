@@ -57,13 +57,13 @@ class RNN(object):
         self.layers.append(sent_decoder_layer)
         self.params += sent_decoder_layer.params
   
-        # reshape to a row with self.num_summaries samples
-        summ_sents_codes = sent_decoder_layer.activation
-        summ_sents_codes = T.reshape(summ_sents_codes, (1, self.batch_size * sent_decoder_layer.out_size))
+        # reshape to a row with num_sentences samples
+        sents_codes = sent_decoder_layer.activation
+        sents_codes = T.reshape(sents_codes, (1, self.batch_size * sent_decoder_layer.out_size))
 
         # word decoder
         word_decoder_layer = WordDecoderLayer(self.cell, rng, str(i + 3), (sent_decoder_layer.out_size, self.out_size),
-                                         summ_sents_codes, self.mask, self.is_train, self.batch_size, self.drop_rate)
+                                         sents_codes, self.mask, self.is_train, self.batch_size, self.drop_rate)
         self.layers.append(word_decoder_layer)
         self.params += word_decoder_layer.params
 
@@ -75,7 +75,6 @@ class RNN(object):
         y_pred = T.clip(y_pred, self.epsilon, 1.0 - self.epsilon)
         return T.nnet.categorical_crossentropy(y_pred, y_true).mean()
     
-
     def define_train_test_funcs(self):
         cost = self.categorical_crossentropy(self.activation, self.X)
 
