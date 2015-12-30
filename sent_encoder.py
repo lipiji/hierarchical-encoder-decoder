@@ -11,7 +11,6 @@ class SentEncoderLayer(object):
     def __init__(self, cell, rng, layer_id, shape, X, mask, is_train = 1, batch_size = 1, p = 0.5):
         prefix = "SentEncoder_"
         self.in_size, self.out_size = shape
-        #sent_X = T.matrix("sent_X")
         
         def code(j):
             i = mask[:, j].sum() - 1
@@ -28,5 +27,5 @@ class SentEncoderLayer(object):
             self.encoder = LSTMLayer(rng, prefix + layer_id, shape, sent_X, mask, is_train, 1, p)
         
         self.activation = self.encoder.activation[self.encoder.activation.shape[0] - 1,:]
-        self.sent_enc = sent_X
+        self.sent_encs = sent_X
         self.params = self.encoder.params

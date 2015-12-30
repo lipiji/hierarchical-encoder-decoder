@@ -8,6 +8,7 @@ from lstm import *
 from word_encoder import *
 from sent_encoder import *
 from sent_decoder import *
+from attention import *
 from word_decoder import *
 from updates import *
 
@@ -53,17 +54,21 @@ class RNN(object):
         codes = encoder_layer.activation
         codes = T.reshape(codes, (1, encoder_layer.out_size))
         # sentence decoder
-        sent_decoder_layer = SentDecoderLayer(self.cell, rng, str(i + 2), (encoder_layer.out_size, encoder_layer.in_size, word_encoder_layer.hidden_size),
-                                         codes, self.mask, encoder_layer.sent_enc, self.is_train, self.batch_size, self.drop_rate, self.num_sents)
+        sent_decoder_layer = SentDecoderLayer(self.cell, rng, str(i + 2), (encoder_layer.out_size, encoder_layer.in_size),
+                                         codes, self.mask, self.is_train, self.batch_size, self.drop_rate)
         self.layers.append(sent_decoder_layer)
         self.params += sent_decoder_layer.params
-  
+
+        sent_encs = encoder_layer.sent_encs
+        sent_decs = sent_decoder_layer.activation 
+        attention_layer = AttentionLayer(str(i + 3), (self.num_sents, sent_decoder_layer.out_size), sent_encs, sent_decs)
+        
         # reshape to a row with num_sentences samples
-        sents_codes = sent_decoder_layer.activation
+        sents_codes = attention_layer.activation
         sents_codes = T.reshape(sents_codes, (1, self.batch_size * sent_decoder_layer.out_size))
 
         # word decoder
-        word_decoder_layer = WordDecoderLayer(self.cell, rng, str(i + 3), (sent_decoder_layer.out_size, self.out_size),
+        word_decoder_layer = WordDecoderLayer(self.cell, rng, str(i + 4), (sent_decoder_layer.out_size, self.out_size),
                                          sents_codes, self.mask, self.is_train, self.batch_size, self.drop_rate)
         self.layers.append(word_decoder_layer)
         self.params += word_decoder_layer.params
