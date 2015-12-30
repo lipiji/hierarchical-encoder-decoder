@@ -63,5 +63,5 @@ for i in xrange(2000):
 print "Finished. Time = " + str(time.time() - start)
 
 print "save model..."
-save_model("./model/char_rnn.model", model)
+save_model("./model/hed.model", model)
 
