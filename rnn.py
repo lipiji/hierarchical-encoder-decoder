@@ -13,7 +13,7 @@ from updates import *
 
 class RNN(object):
     def __init__(self, in_size, out_size, hidden_size,
-                 cell = "gru", optimizer = "rmsprop", p = 0.5):
+                 cell = "gru", optimizer = "rmsprop", p = 0.5, num_sents = 1):
 
         self.X = T.matrix("X")
         self.in_size = in_size
@@ -21,6 +21,7 @@ class RNN(object):
         self.hidden_size = hidden_size
         self.cell = cell
         self.drop_rate = p
+        self.num_sents = num_sents
         self.is_train = T.iscalar('is_train') # for dropout
         self.batch_size = T.iscalar('batch_size') # for mini-batch training
         self.mask = T.matrix("mask")
@@ -52,8 +53,8 @@ class RNN(object):
         codes = encoder_layer.activation
         codes = T.reshape(codes, (1, encoder_layer.out_size))
         # sentence decoder
-        sent_decoder_layer = SentDecoderLayer(self.cell, rng, str(i + 2), (encoder_layer.out_size, encoder_layer.in_size),
-                                         codes, self.mask, self.is_train, self.batch_size, self.drop_rate)
+        sent_decoder_layer = SentDecoderLayer(self.cell, rng, str(i + 2), (encoder_layer.out_size, encoder_layer.in_size, word_encoder_layer.hidden_size),
+                                         codes, self.mask, encoder_layer.sent_enc, self.is_train, self.batch_size, self.drop_rate, self.num_sents)
         self.layers.append(sent_decoder_layer)
         self.params += sent_decoder_layer.params
   

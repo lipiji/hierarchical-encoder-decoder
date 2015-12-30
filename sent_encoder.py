@@ -28,6 +28,5 @@ class SentEncoderLayer(object):
             self.encoder = LSTMLayer(rng, prefix + layer_id, shape, sent_X, mask, is_train, 1, p)
         
         self.activation = self.encoder.activation[self.encoder.activation.shape[0] - 1,:]
+        self.sent_enc = sent_X
         self.params = self.encoder.params
-
-
