@@ -92,7 +92,7 @@ class RNN(object):
         #updates = momentum(self.params, gparams, lr)
         #updates = rmsprop(self.params, gparams, lr)
         #updates = adagrad(self.params, gparams, lr)
-        #updates = dadelta(self.params, gparams, lr)
+        #updates = adadelta(self.params, gparams, lr)
         #updates = adam(self.params, gparams, lr)
         
         self.train = theano.function(inputs = [self.X, self.mask, lr, self.batch_size],
