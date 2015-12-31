@@ -59,6 +59,7 @@ class RNN(object):
         self.layers.append(sent_decoder_layer)
         self.params += sent_decoder_layer.params
 
+        # attention layer (syncrhonous update)
         sent_encs = encoder_layer.sent_encs
         sent_decs = sent_decoder_layer.activation 
         attention_layer = AttentionLayer(str(i + 3), (self.num_sents, sent_decoder_layer.out_size), sent_encs, sent_decs)
