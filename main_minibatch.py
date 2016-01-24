@@ -45,10 +45,11 @@ for i in xrange(2000):
 
     for s in xrange(int(sents.shape[1] / dim_y)):
         xs = sents[:, s * dim_y : (s + 1) * dim_y]
-        for w in xrange(xs.shape[0]):
-            if i2w[np.argmax(xs[w,:])] == "<eoss>":
+        for w_i in xrange(xs.shape[0]):
+            w = i2w[np.argmax(xs[w_i, :])]
+            if w == "<eoss>":
                 break
-            print i2w[np.argmax(xs[w,:])],
+            print w,
         print "\n"
 
     error /= len(data_xy);
