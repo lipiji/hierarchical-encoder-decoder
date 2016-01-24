@@ -8,12 +8,13 @@ from lstm import *
 from word_encoder import *
 from sent_encoder import *
 from sent_decoder import *
+from attention import *
 from word_decoder import *
 from updates import *
 
 class RNN(object):
     def __init__(self, in_size, out_size, hidden_size,
-                 cell = "gru", optimizer = "rmsprop", p = 0.5):
+                 cell = "gru", optimizer = "rmsprop", p = 0.5, num_sents = 1):
 
         self.X = T.matrix("X")
         self.in_size = in_size
@@ -21,6 +22,7 @@ class RNN(object):
         self.hidden_size = hidden_size
         self.cell = cell
         self.drop_rate = p
+        self.num_sents = num_sents
         self.is_train = T.iscalar('is_train') # for dropout
         self.batch_size = T.iscalar('batch_size') # for mini-batch training
         self.mask = T.matrix("mask")
@@ -56,13 +58,18 @@ class RNN(object):
                                          codes, self.mask, self.is_train, self.batch_size, self.drop_rate)
         self.layers.append(sent_decoder_layer)
         self.params += sent_decoder_layer.params
-  
+
+        # attention layer (syncrhonous update)
+        sent_encs = encoder_layer.sent_encs
+        sent_decs = sent_decoder_layer.activation 
+        attention_layer = AttentionLayer(str(i + 3), (self.num_sents, sent_decoder_layer.out_size), sent_encs, sent_decs)
+        
         # reshape to a row with num_sentences samples
-        sents_codes = sent_decoder_layer.activation
+        sents_codes = attention_layer.activation
         sents_codes = T.reshape(sents_codes, (1, self.batch_size * sent_decoder_layer.out_size))
 
         # word decoder
-        word_decoder_layer = WordDecoderLayer(self.cell, rng, str(i + 3), (sent_decoder_layer.out_size, self.out_size),
+        word_decoder_layer = WordDecoderLayer(self.cell, rng, str(i + 4), (sent_decoder_layer.out_size, self.out_size),
                                          sents_codes, self.mask, self.is_train, self.batch_size, self.drop_rate)
         self.layers.append(word_decoder_layer)
         self.params += word_decoder_layer.params
@@ -92,7 +99,7 @@ class RNN(object):
         #updates = momentum(self.params, gparams, lr)
         #updates = rmsprop(self.params, gparams, lr)
         #updates = adagrad(self.params, gparams, lr)
-        #updates = dadelta(self.params, gparams, lr)
+        #updates = adadelta(self.params, gparams, lr)
         #updates = adam(self.params, gparams, lr)
         
         self.train = theano.function(inputs = [self.X, self.mask, lr, self.batch_size],

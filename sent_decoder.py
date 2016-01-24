@@ -17,7 +17,6 @@ class SentDecoderLayer(object):
         self.W_hy = init_weights((self.in_size, self.out_size), prefix + "W_hy" + layer_id)
         self.b_y = init_bias(self.out_size, prefix + "b_y" + layer_id)
 
-
         if cell == "gru":
             self.decoder = GRULayer(rng, prefix + layer_id, shape, self.X, mask, is_train, 1, p)
             def _active(pre_h, x):
@@ -40,5 +39,6 @@ class SentDecoderLayer(object):
        
         y = T.reshape(y, (self.summs, self.out_size))
         self.activation = y
+
         self.params = self.decoder.params + [self.W_hy, self.b_y]
 

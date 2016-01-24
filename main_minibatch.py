@@ -23,10 +23,11 @@ optimizer = "adadelta"
 seqs, i2w, w2i, data_xy = data.word_sequence("/data/toy.txt", batch_size)
 dim_x = len(w2i)
 dim_y = len(w2i)
+num_sents = data_xy[0][3]
 print "#features = ", dim_x, "#labels = ", dim_y
 
 print "compiling..."
-model = RNN(dim_x, dim_y, hidden_size, cell, optimizer, drop_rate)
+model = RNN(dim_x, dim_y, hidden_size, cell, optimizer, drop_rate, num_sents)
 
 print "training..."
 start = time.time()
@@ -63,5 +64,5 @@ for i in xrange(2000):
 print "Finished. Time = " + str(time.time() - start)
 
 print "save model..."
-save_model("./model/char_rnn.model", model)
+save_model("./model/hed.model", model)
 
