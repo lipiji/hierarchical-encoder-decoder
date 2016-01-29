@@ -8,9 +8,9 @@ from utils_pg import *
 from rnn import *
 import data
 
-use_gpu(0) # -1:cpu; 0,1,2,..: gpu
+use_gpu(1) # -1:cpu; 0,1,2,..: gpu
 
-e = 0.0
+e = 0.01
 lr = 0.5
 drop_rate = 0.
 batch_size = 1000

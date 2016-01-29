@@ -34,7 +34,7 @@ class GRULayer(object):
             gh = T.tanh(T.dot(x, self.W_xh) + T.dot(r * pre_h, self.W_hh) + self.b_h)
             h = z * pre_h + (1 - z) * gh
             
-            h = h * m[:, None]
+            h = h * m[:, None] + (1 - m[:, None]) * pre_h
             
             h = T.reshape(h, (1, batch_size * self.out_size))
             return h
