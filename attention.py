@@ -10,6 +10,7 @@ class AttentionLayer(object):
         layer_id = "_" + layer_id
         self.num_sents, self.out_size = shape
 
+        # TODO fix the attention layer using standard attentnion modeling method
         self.W_a1 = init_weights((self.out_size, self.out_size), prefix + "W_a1" + layer_id)
         self.W_a2 = init_weights((self.out_size, self.out_size), prefix + "W_a2" + layer_id)
         self.W_a3 = init_weights((self.out_size, self.out_size), prefix + "W_a3" + layer_id)
