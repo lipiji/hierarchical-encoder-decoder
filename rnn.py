@@ -80,10 +80,16 @@ class RNN(object):
         self.epsilon = 1.0e-15
     def categorical_crossentropy(self, y_pred, y_true):
         y_pred = T.clip(y_pred, self.epsilon, 1.0 - self.epsilon)
-        return T.nnet.categorical_crossentropy(y_pred, y_true).mean()
-    
+        m = T.reshape(self.mask, (self.mask.shape[0] * self.batch_size, 1))
+        ce = T.nnet.categorical_crossentropy(y_pred, y_true)
+        ce = T.reshape(ce, (self.mask.shape[0] * self.batch_size, 1))
+        return T.sum(ce * m) / T.sum(m)
+
+
     def define_train_test_funcs(self):
-        cost = self.categorical_crossentropy(self.activation, self.X)
+        pYs = T.reshape(self.activation, (self.mask.shape[0] * self.batch_size, self.out_size))
+        tYs =  T.reshape(self.X, (self.mask.shape[0] * self.batch_size, self.out_size))
+        cost = self.categorical_crossentropy(pYs, tYs)
 
         gparams = []
         for param in self.params:
