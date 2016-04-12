@@ -4,6 +4,18 @@ import numpy as np
 import theano
 import theano.tensor as T
 
+'''
+def clip_norm(g, c, n):
+    if c > 0:
+        g = K.switch(n >= c, g * c / n, g)
+    return g
+
+def clip(x, min_value, max_value):
+    if max_value < min_value:
+        max_value = min_value
+    return T.clip(x, min_value, max_value)
+'''
+
 def sgd(params, gparams, learning_rate = 0.1):
     updates = []
     for p, g in zip(params, gparams):
@@ -18,6 +30,17 @@ def momentum(params, gparams, learning_rate = 0.1, momentum = 0.9):
         x = momentum * velocity - learning_rate * g
         updates.append((velocity, x))
         updates.append((p, p + x))
+    return updates
+
+def nesterov_momentum(params, gparams, learning_rate = 0.1, momentum = 0.9):
+    updates = []
+    for p, g in zip(params, gparams):
+        v = p.get_value(borrow = True)
+        velocity = theano.shared(np.zeros(v.shape, dtype = v.dtype), broadcastable = p.broadcastable)
+        x = momentum * velocity - learning_rate * g
+        updates.append((velocity, x))
+        inc = momentum * x - learning_rate * g
+        updates.append((p, p + inc))
     return updates
 
 def rmsprop(params, gparams, learning_rate = 0.001, rho = 0.9, epsilon = 1e-6):
