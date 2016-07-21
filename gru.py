@@ -32,7 +32,7 @@ class GRULayer(object):
             r = T.nnet.sigmoid(T.dot(x, self.W_xr) + T.dot(pre_h, self.W_hr) + self.b_r)
             z = T.nnet.sigmoid(T.dot(x, self.W_xz) + T.dot(pre_h, self.W_hz) + self.b_z)
             gh = T.tanh(T.dot(x, self.W_xh) + T.dot(r * pre_h, self.W_hh) + self.b_h)
-            h = z * pre_h + (1 - z) * gh
+            h = (1 - z) * pre_h + z * gh
             
             h = h * m[:, None] + (1 - m[:, None]) * pre_h
             
